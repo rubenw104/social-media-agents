@@ -63,7 +63,7 @@ def process_image(result, urls, saved_images, folder):
     
 def image_retrieve(query, max_results:int = 3, folder="downloads"):
     # save_image(image_search(query,max_results=max_results), folder=folder)
-    image_results = DDGS().images(query=query, max_results=max_results)
+    image_results = DDGS().images(query=query, max_results=max_results+2)
     saved_images=0
     
     clean_folder(folder)
@@ -75,10 +75,10 @@ def image_retrieve(query, max_results:int = 3, folder="downloads"):
         saved_images= process_image(result, urls, saved_images, folder)
     
     while saved_images < max_results:
-        image_results = DDGS().images(query=query, max_results=max_results-saved_images+1)
+        image_results = DDGS().images(query=query, max_results=max_results-saved_images+2)
         for result in image_results:
             saved_images= process_image(result, urls, saved_images, folder)
 
 
 
-image_retrieve('example', max_results=20)
+# image_retrieve('example', max_results=20)
