@@ -4,16 +4,28 @@ import os
 from image_retrieve import image_retrieve, clean_folder
 from post_generation import generate_post
 
-st.header('Benvenuto in Gengram:')
-st.subheader('L\'applicazione che ti suggerisce post da pubblicare su instagram!')
-st.write('Inserisci l\'argomento del post che vuoi pubblicare')
+st.header('Welcome to Gengram:')
+st.subheader('The app that suggests contents to post on Instagram!')
+st.write('Please enter the topic of the post you want to publish.')
 
-with st.form("Argomento"):
-    argomento = st.text_input("Argomento:")
-    submitted = st.form_submit_button("Cerca immagine")
+if 'cleaned' not in st.session_state:
+    st.session_state.cleaned = True
+    clean_folder('downloads')
+
+with st.form("Topic"):
+    argomento = st.text_input("Topic:")
+    submitted = st.form_submit_button("Search for Immages")
+
+# Variabile per tracciare l'immagine selezionata
+if "selezionata" not in st.session_state:
+    st.session_state.selezionata = None
+    st.session_state.id_selezionata= None
+
 
 if submitted and argomento:
     image_retrieve(argomento, max_results=3)
+    st.session_state.selezionata = None
+    st.session_state.id_selezionata= None
 
 # Cartella immagini
 cartella = "downloads"
@@ -22,10 +34,6 @@ immagini = os.listdir(cartella)
 # Layout a colonne per le anteprime
 cols = st.columns(3)
 
-# Variabile per tracciare l'immagine selezionata
-if "selezionata" not in st.session_state:
-    st.session_state.selezionata = None
-    st.session_state.id_selezionata= None
 
 # Mostra le immagini come pulsanti cliccabili
 for i, img_file in enumerate(immagini[:3]):
@@ -37,15 +45,15 @@ for i, img_file in enumerate(immagini[:3]):
         img = Image.open(img_path)
         st.image(img)
 
-        if st.button(f"Scegli Immagine {i+1}"):
+        if st.button(f"Select Immage {i+1}"):
             st.session_state.selezionata = img_file
             st.session_state.id_selezionata = i+1
 
 # Se è stata selezionata un'immagine, la mostriamo in grande
 if st.session_state.selezionata is not None:
-    st.subheader(f"Stai selezionando: Immagine {st.session_state.id_selezionata}")
+    st.subheader(f"You are selecting: Immage {st.session_state.id_selezionata}")
     img = Image.open(os.path.join(cartella, st.session_state.selezionata))
     st.image(img)
 
-if st.button(f"Genera Prompt"):
-    st.write(generate_post(argomento))
+    if st.button(f"Generate Caption"):
+        st.write(generate_post(argomento))
